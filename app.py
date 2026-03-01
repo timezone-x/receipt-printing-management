@@ -31,7 +31,12 @@ def index():
 
 
 @app.route('/app/task')
-def task()
+def task():
+    token = request.form.get('token')
+    task_name = request.form.get('name')
+    task_priority = request.form.get('priority')
+    task_deadline = request.form.get('deadline')
+    task_desc = request.form.get('desc')
 
 
 if __name__ == '__main__':
