@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Task Printing
+{% endblock %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+<form action="/app/task" method="post">
+  <label for="token">Token*</label>
+  <input type="password" id="token" name="token" autofocus required><br>
+  <label for="name">Name*</label>
+  <input type="text" id="name" name="name" required><br>
+  <label for="priority">Priority:</label>
+  <input type="radio" id="0" name="priority" value="Low" required><label for="0">Low</label>
+  <input type="radio" id="1" name="priority" value="Medium" required><label for="0">Medium</label>
+  <input type="radio" id="2" name="priority" value="High" required><label for="0">High</label>
+  <input type="radio" id="3" name="priority" value="Very High" required><label for="0">Very High</label><br>
+  <label for="deadline">Deadline</label>
+  <input type="time" name="deadline" id="deadline"><br>
+  <label for="desc">Description</label><br>
+  <textarea id="desc" name="desc"></textarea><br>
+  <input type="submit"> <input type="reset">
+
+</form>
+{% endblock %}

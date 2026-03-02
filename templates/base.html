@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="author" content="Connor McMahon">
+  <meta name="viewport" content="width=device-width, intial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  <title>
+    {% block title %}
+    {% endblock %}
+    | Printing API
+  </title>
+  {% block head %}
+
+  {% endblock %}
+</head>
+
+<body>
+  {% block body %}
+
+  {% endblock %}
+</body>
+
+</html>
