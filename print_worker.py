@@ -1,11 +1,13 @@
 import time
 import json
 import os
+import logging
 from pathlib import Path
 import mysql.connector
 from escpos.printer import Usb
 from dotenv import load_dotenv
 
+logger = logging.getLogger('printer_worker')
 
 priority_map = {
     0: "Low",
@@ -21,14 +23,17 @@ class QueueDB:
         self.config_path = Path(config_path)
         with open(self.config_path, "r", encoding="utf-8") as f:
             configs = json.load(f)
-            self.host = configs.get('host')
-            self.user = configs.get('user')
-            self.password = configs.get('password')
-            self.database = configs.get('database')
+            self.host = configs.get('mysql').get('host')
+            print(self.host)
+            self.user = configs.get('mysql').get('user')
+            self.password = configs.get('mysql').get('password')
+            self.database = configs.get('mysql').get('database')
 
-            self.receipt_printer_VID = int(os.getenv("RECIPT_PRINTER_VID"), 16)
-            self.receipt_printer_VID = int(os.getenv("RECIPT_PRINTER_PID"), 16)
-            self.receipt_printer_VID = os.getenv("RECIPT_PRINTER-TIMEOUT")
+            self.receipt_printer_VID = int(
+                os.getenv("RECEIPT_PRINTER_VID"), 16)
+            self.receipt_printer_VID = int(
+                os.getenv("RECEIPT_PRINTER_PID"), 16)
+            self.receipt_printer_VID = os.getenv("RECEIPT_PRINTER-TIMEOUT")
 
     def fetch_next_job(self):
         with mysql.connector.connect(host=self.host, user=self.user, password=self.password, database=self.database) as db:
@@ -39,11 +44,11 @@ class QueueDB:
             db.commit()
             return job
 
-    def mark_job_status(self, job_id, status):
+    def mark_job_status(self, job_id, status, fail_reason=None):
         with mysql.connector.connect(host=self.host, user=self.user, password=self.password, database=self.database) as db:
             cursor = db.cursor()
             cursor.execute(
-                'UPDATE jobs Set status=%s WHERE id=%s', (status, job_id))
+                'UPDATE jobs Set status=%s fail_reason=%s WHERE id=%s', (status, fail_reason, job_id))
             db.commit()
 
     def job_funnel(self, job):
@@ -112,6 +117,7 @@ if __name__ == '__main__':
     while True:
         job = queue.fetch_next_job()
         if job:
+            prin
             queue.mark_job_status(job['id'], 'printing')
             queue.job_funnel(job)
         else:
