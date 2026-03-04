@@ -1,14 +1,12 @@
 import time
 import json
+import os
 from pathlib import Path
 import mysql.connector
 from escpos.printer import Usb
+from dotenv import load_dotenv
 
-printer = Usb(
-    0x04B8,
-    0x0202,
-    timeout=0
-)
+
 priority_map = {
     0: "Low",
     1: "Medium",
@@ -19,6 +17,7 @@ priority_map = {
 
 class QueueDB:
     def __init__(self, config_path):
+        load_dotenv()
         self.config_path = Path(config_path)
         with open(self.config_path, "r", encoding="utf-8") as f:
             configs = json.load(f)
@@ -26,6 +25,10 @@ class QueueDB:
             self.user = configs.get('user')
             self.password = configs.get('password')
             self.database = configs.get('database')
+
+            self.receipt_printer_VID = int(os.getenv("RECIPT_PRINTER_VID"), 16)
+            self.receipt_printer_VID = int(os.getenv("RECIPT_PRINTER_PID"), 16)
+            self.receipt_printer_VID = os.getenv("RECIPT_PRINTER-TIMEOUT")
 
     def fetch_next_job(self):
         with mysql.connector.connect(host=self.host, user=self.user, password=self.password, database=self.database) as db:
@@ -43,4 +46,73 @@ class QueueDB:
                 'UPDATE jobs Set status=%s WHERE id=%s', (status, job_id))
             db.commit()
 
-    def print_job(self, job):
+    def job_funnel(self, job):
+        printer = job.get(printer)
+        if printer == 'receipt':
+            self.receipt_funnel(job)
+        else:
+            self.mark_job_status(job['id'], 'failed')
+            print(f"Failed Job {job['id']}: Invalid Printer")
+
+    def receipt_funnel(self, job):
+        job_type = job.get("job_type")
+        if job_type == "task":
+            self.print_task(job)
+        elif job_type == 'message':
+            self.print_Rmessage(job)
+        elif job_type == 'shopping_list':
+            self.print_Rshopping_list(job)
+        else:
+            self.mark_job_status(job['id'], 'failed')
+            print(f"Failed Job {job['id']}: Invalid Receipt Job Type")
+
+    def print_task(self, job):
+        try:
+            with Usb(self.receipt_printer_VID, self.receipt_printer_PID, self.receipt_printer_timeout) as receipt_printer:
+                job_header = job.get('header')
+                task_name = job_header.get('name')
+
+                temp_priority = job_header.get('priority')
+                task_priority = priority_map.get(temp_priority)
+
+                task_deadline = job_header.get('deadline')
+                task_desc = job.get("body")
+
+                receipt_printer.set(bold=True)
+                receipt_printer.text("="*42)
+                receipt_printer.set(bold=True, double_height=2,
+                                    double_width=2, align='left')
+                receipt_printer.text(f"\n\n{task_name}\n")
+                receipt_printer._raw(b'\x1B\x21\x00')
+                receipt_printer.set(bold=True)
+                receipt_printer.text(f"Priority: {task_priority}\n")
+                if task_deadline:
+                    receipt_printer.text(f"Deadline: {task_deadline}\n")
+                if task_desc:
+                    receipt_printer.text(f"{task_desc}\n")
+                receipt_printer.text("\n\n")
+                receipt_printer.print_and_feed()
+                receipt_printer.print_and_feed()
+                receipt_printer.print_and_feed()
+                receipt_printer.print_and_feed()
+                receipt_printer.print_and_feed()
+                receipt_printer.text("="*42)
+                receipt_printer.cut()
+                self.mark_job_status(job['id'], 'done')
+                print(f"Printed Job {job['id']}")
+
+        except Exception as e:
+            self.mark_job_status(job['id'], 'failed')
+            print(f"Failed job {job['id']}: {e}")
+
+
+queue = QueueDB('config.json')
+
+if __name__ == '__main__':
+    while True:
+        job = queue.fetch_next_job()
+        if job:
+            queue.mark_job_status(job['id'], 'printing')
+            queue.job_funnel(job)
+        else:
+            time.sleep(1)

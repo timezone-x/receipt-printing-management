@@ -19,7 +19,7 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/app/task', methods=['POST', 'GET'])
+@app.route('/receipt/task', methods=['POST', 'GET'])
 def task():
     if request.method == 'POST':
         token = request.form.get('token')
@@ -27,11 +27,13 @@ def task():
         task_priority = request.form.get('priority')
         task_deadline = request.form.get('deadline')
         task_desc = request.form.get('desc')
+        printer = 'receipt'
         job_type = "task"
         job_header = {"name": task_name,
                       'priority': task_priority, "deadline": task_deadline}
         job_body = task_desc
-        print_queue.add(job_type, job_header, job_body)
+        print_queue.add(printer, job_type, job_header, job_body)
+        return render_template('task.html')
     elif request.method == 'GET':
         return render_template('task.html')
 

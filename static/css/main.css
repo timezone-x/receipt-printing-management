@@ -1,3 +1,33 @@
 html body {
     font-family: Helvetica;
+    text-align: center;
+
+}
+
+.index_main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin: 5vw;
+    justify-content: center;
+
+}
+
+.index_section {
+
+    border: 1px black solid;
+    padding: 2vw;
+
+}
+
+.index_section h1 {
+    margin: 0 0 1vw 0;
+}
+
+.index_section a {
+    color: white;
+    background-color: rgb(102, 162, 11);
+    padding: 1.5vw;
+    text-decoration: none;
+    margin: 2vw;
 }
