@@ -17,7 +17,8 @@ class QueueHandler:
         with mysql.connector.connect(host=self.host, user=self.user, password=self.password, database=self.database) as db:
             cursor = db.cursor()
             sql = "INSERT INTO jobs (printer, job_type, job_header, job_body) VALUES (%s, %s, %s, %s)"
-            vals = (printer, job_type, str(job_header), job_body)
+            vals = (printer, job_type, str(
+                job_header).replace("'", '"'), job_body)
             cursor.execute(sql, vals)
             db.commit()
             print("added job to the queue")
