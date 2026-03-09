@@ -1,6 +1,7 @@
 import time
 import json
 import os
+import textwrap
 from pathlib import Path
 import mysql.connector
 from escpos.printer import Usb
@@ -89,13 +90,13 @@ class QueueDB:
             receipt_printer = self.open_receipt_printer()
 
             job_header = job.get('job_header')
-            task_name = job_header.get('name')
+            task_name = textwrap.fill(job_header.get('name'), width=21)
 
             temp_priority = job_header.get('priority')
             task_priority = priority_map.get(temp_priority)
 
             task_deadline = job_header.get('deadline')
-            task_desc = job.get("job_body")
+            temp_task_desc = job.get("job_body")
 
             receipt_printer.set(bold=True)
             receipt_printer.text("="*42)
@@ -107,7 +108,8 @@ class QueueDB:
             receipt_printer.text(f"Priority: {task_priority}\n")
             if task_deadline:
                 receipt_printer.text(f"Deadline: {task_deadline}\n")
-            if task_desc:
+            if temp_task_desc:
+                task_desc = textwrap.fill(temp_task_desc, width=42)
                 receipt_printer.text(f"{task_desc}\n")
             receipt_printer.text("\n\n")
             receipt_printer.print_and_feed()
