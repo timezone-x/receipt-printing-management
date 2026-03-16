@@ -31,3 +31,47 @@ html body {
     text-decoration: none;
     margin: 2vw;
 }
+
+
+
+
+form {
+    border: 1px black solid;
+    border-radius: 12px;
+    margin: auto;
+    width: 30%;
+    padding: 2vw;
+
+}
+
+form input {
+    margin: 1vw;
+    border-radius: 4px;
+    padding: 4px;
+}
+
+form textarea {
+    border-radius: 4px;
+}
+
+.result_fail {
+    width: 32%;
+    margin: auto;
+    margin-bottom: 1vw;
+    background-color: red;
+    border: 3px darkred solid;
+    border-radius: 12px;
+    color: white;
+    padding: 1vw;
+}
+
+.result_success {
+    width: 30%;
+    margin: auto;
+    margin-bottom: 1vw;
+    background-color: green;
+    border: 3px darkgreen solid;
+    border-radius: 12px;
+    padding: 1vw;
+    color: white;
+}

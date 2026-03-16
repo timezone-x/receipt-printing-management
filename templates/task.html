@@ -9,21 +9,24 @@ Task Printing
 {% endblock %}
 
 {% block body %}
-<form action="/receipt/task" method="post">
-  <label for="token">Token*</label>
-  <input type="password" id="token" name="token" autofocus required><br>
-  <label for="name">Name*</label>
-  <input type="text" id="name" name="name" required><br>
-  <label for="priority">Priority:</label>
-  <input type="radio" id="0" name="priority" value="0" required><label for="0">Low</label>
-  <input type="radio" id="1" name="priority" value="1" required><label for="0">Medium</label>
-  <input type="radio" id="2" name="priority" value="2" required><label for="0">High</label>
-  <input type="radio" id="3" name="priority" value="3" required><label for="0">Very High</label><br>
-  <label for="deadline">Deadline</label>
-  <input type="time" name="deadline" id="deadline"><br>
-  <label for="desc">Description</label><br>
-  <textarea id="desc" name="desc"></textarea><br>
-  <input type="submit"> <input type="reset">
+<div class="task-form">
+  <div id="result">
 
-</form>
+  </div>
+  <form id="task-form">
+    <input type="password" id="token" name="token" placeholder="Token*" autofocus required><br>
+    <input type="text" id="name" name="name" placeholder="Name*" required><br>
+    <label for="priority">Priority:</label><br>
+    <input type="radio" id="0" name="priority" value="0" required><label for="0">Low</label>
+    <input type="radio" id="1" name="priority" value="1" required><label for="1">Medium</label>
+    <input type="radio" id="2" name="priority" value="2" required><label for="2">High</label>
+    <input type="radio" id="3" name="priority" value="3" required><label for="3">Very High</label><br>
+    <label for="deadline">Deadline</label><br>
+    <input type="time" name="deadline" id="deadline"><br>
+    <label for="desc">Description</label><br>
+    <textarea id="desc" name="desc"></textarea><br>
+    <input type="submit"> <input type="reset">
+
+  </form>
+</div>
 {% endblock %}

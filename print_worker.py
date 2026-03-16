@@ -1,4 +1,5 @@
 import time
+import datetime
 import json
 import os
 import textwrap
@@ -129,6 +130,24 @@ class QueueDB:
         finally:
             receipt_printer.close()
 
+    # def print_receipt_shopping_list(self, job):
+    #     print(f"Printing Job {job['id']}")
+    #     try:
+    #         receipt_printer = self.open_receipt_printer()
+    #         job_header = job.get('job_header')
+    #         list_items = job.get('job_body')
+    #         date = job.get('created_at').strftime("%x")
+    #         receipt_printer.set(bold=True, double_height=2,
+    #                             double_width=2, align='center')
+    #         receipt_printer.text("SHOPPING LIST")
+    #         receipt_printer._raw(b'\x1B\x21\x00')
+    #         receipt_printer.text(f"Date: {date}")
+    #         receipt_printer.text("="*42)
+    #         receipt_printer.text("Items:")
+    #         receipt_printer.set(bold=True)
+
+    #         for i in list_items:
+
 
 queue = QueueDB('config.json')
 
@@ -139,6 +158,7 @@ if __name__ == '__main__':
             print("Job Found!")
 
             print("Converting Job header to JSON")
+            print(job.get("job_header   "))
             job['job_header'] = json.loads(job.get('job_header'))
             print(job)
             queue.mark_job_status(job['id'], 'printing')

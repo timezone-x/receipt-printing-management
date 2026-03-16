@@ -39,5 +39,25 @@ def task():
         return render_template('task.html')
 
 
+@app.route('/api/receipt/task', methods=['POST'])
+def api_task():
+    token = request.args.get('token')
+    task_name = request.args.get('name')
+    task_priority = request.args.get('priority')
+    task_deadline = request.args.get('deadline')
+    task_desc = request.args.get('description')
+    printer = 'receipt'
+    job_type = 'task'
+    job_header = {
+        'sender': '',
+        'name': task_name,
+        'priority': task_priority,
+        'deadline': task_deadline
+    }
+    job_body = task_desc
+    print_queue.add(printer, job_type, job_header, job_body)
+    return jsonify({'status': 200})
+
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
