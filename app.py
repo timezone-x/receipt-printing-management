@@ -2,8 +2,8 @@ from datetime import date
 import json
 from datetime import timedelta, datetime
 from flask import Flask, jsonify, redirect, render_template, url_for, request, session
-from escpos.printer import Usb
 from queue_handler import QueueHandler
+from key_manager import KeyManager
 
 
 app = Flask(__name__)
@@ -12,6 +12,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=5)
 app.config['SESSION_REFRESH_EACH_REQUEST'] = True
 
 print_queue = QueueHandler(config_path="config.json")
+KM = KeyManager()
 
 
 @app.route('/')
@@ -19,44 +20,34 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/receipt/task', methods=['POST', 'GET'])
+@app.route('/receipt/task')
 def task():
-    if request.method == 'POST':
-        token = request.form.get('token')
-        task_name = request.form.get('name')
-        task_priority = int(request.form.get('priority'))
-        task_deadline = request.form.get('deadline')
-        task_desc = request.form.get('desc')
-        printer = 'receipt'
-        job_type = "task"
-        job_header = {"name": task_name,
-                      "priority": task_priority, "deadline": task_deadline}
-        job_body = task_desc
-        print_queue.add(printer, job_type,
-                        job_header, job_body)
-        return render_template('task.html')
-    elif request.method == 'GET':
-        return render_template('task.html')
+    return render_template('task.html')
 
 
 @app.route('/api/receipt/task', methods=['POST'])
 def api_task():
     token = request.args.get('token')
-    task_name = request.args.get('name')
-    task_priority = request.args.get('priority')
-    task_deadline = request.args.get('deadline')
-    task_desc = request.args.get('description')
-    printer = 'receipt'
-    job_type = 'task'
-    job_header = {
-        'sender': '',
-        'name': task_name,
-        'priority': task_priority,
-        'deadline': task_deadline
-    }
-    job_body = task_desc
-    print_queue.add(printer, job_type, job_header, job_body)
-    return jsonify({'status': 200})
+    if KM.checkKeyPerm(token, "task") == 200:
+        key_info = KM.getInfo(token)
+        sender = key_info.get("name")
+        task_name = request.json.get('name')
+        task_priority = request.json.get('priority')
+        task_deadline = request.json.get('deadline')
+        task_desc = request.json.get('description')
+        printer = 'receipt'
+        job_type = 'task'
+        job_header = {
+            'sender': sender,
+            'name': task_name,
+            'priority': task_priority,
+            'deadline': task_deadline
+        }
+        job_body = task_desc
+        print_queue.add(printer, job_type, job_header, job_body)
+        return jsonify({'status': 200})
+    else:
+        return jsonify({"status": KM.checkKeyPerm(token, "task")})
 
 
 if __name__ == '__main__':

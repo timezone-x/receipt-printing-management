@@ -3,13 +3,18 @@
 {% block title %}
 Task Printing
 {% endblock %}
-
 {% block head %}
+<script src="{{ url_for('static', filename='js/task.js') }}" defer></script>
 
 {% endblock %}
 
 {% block body %}
-<div class="task-form">
+<div>
+  <a href="/">
+    Home
+  </a>
+</div>
+<div>
   <div id="result">
 
   </div>
@@ -18,14 +23,14 @@ Task Printing
     <input type="text" id="name" name="name" placeholder="Name*" required><br>
     <label for="priority">Priority:</label><br>
     <input type="radio" id="0" name="priority" value="0" required><label for="0">Low</label>
-    <input type="radio" id="1" name="priority" value="1" required><label for="1">Medium</label>
-    <input type="radio" id="2" name="priority" value="2" required><label for="2">High</label>
-    <input type="radio" id="3" name="priority" value="3" required><label for="3">Very High</label><br>
+    <input type="radio" id="1" name="priority" value="1"><label for="1">Medium</label>
+    <input type="radio" id="2" name="priority" value="2"><label for="2">High</label>
+    <input type="radio" id="3" name="priority" value="3"><label for="3">Very High</label><br>
     <label for="deadline">Deadline</label><br>
     <input type="time" name="deadline" id="deadline"><br>
-    <label for="desc">Description</label><br>
-    <textarea id="desc" name="desc"></textarea><br>
-    <input type="submit"> <input type="reset">
+    <label for="description">Description</label><br>
+    <textarea id="description" name="description"></textarea><br>
+    <input type="submit" id="submit"> <input type="reset">
 
   </form>
 </div>
