@@ -1,17 +1,17 @@
-from datetime import date
-import json
-from datetime import timedelta, datetime
+import os
+from datetime import timedelta
+from dotenv import load_dotenv
 from flask import Flask, jsonify, redirect, render_template, url_for, request, session
 from queue_handler import QueueHandler
 from key_manager import KeyManager
 
-
+load_dotenv()
 app = Flask(__name__)
-app.secret_key = "jkpoJlkLMJplk0JL"
+app.secret_key = os.getenv("FLASK_KEY")
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=5)
 app.config['SESSION_REFRESH_EACH_REQUEST'] = True
 
-print_queue = QueueHandler(config_path="config.json")
+print_queue = QueueHandler()
 KM = KeyManager()
 
 

@@ -1,17 +1,15 @@
-import json
-from pathlib import Path
+import os
+from dotenv import load_dotenv
 import mysql.connector
 
 
 class QueueHandler:
-    def __init__(self, config_path):
-        self.config_path = Path(config_path)
-        with open(self.config_path, "r", encoding="utf-8") as f:
-            configs = json.load(f)
-            self.host = configs.get('mysql').get('host')
-            self.user = configs.get('mysql').get('user')
-            self.password = configs.get('mysql').get('password')
-            self.database = configs.get('mysql').get('database')
+    def __init__(self,):
+        load_dotenv()
+        self.host = os.getenv("DB_HOST")
+        self.user = os.getenv("DB_USER")
+        self.password = os.getenv("DB_PASSWORD")
+        self.database = os.getenv("DB_NAME")
 
     def add(self, printer, job_type, job_header, job_body):
         with mysql.connector.connect(host=self.host, user=self.user, password=self.password, database=self.database) as db:

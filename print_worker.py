@@ -1,9 +1,7 @@
 import time
-import datetime
 import json
 import os
 import textwrap
-from pathlib import Path
 import mysql.connector
 from escpos.printer import Usb
 from dotenv import load_dotenv
@@ -18,22 +16,18 @@ priority_map = {
 
 
 class QueueDB:
-    def __init__(self, config_path):
+    def __init__(self):
         load_dotenv()
-        self.config_path = Path(config_path)
-        with open(self.config_path, "r", encoding="utf-8") as f:
-            configs = json.load(f)
-            print(configs)
-            self.host = configs.get('mysql').get('host')
-            self.user = configs.get('mysql').get('user')
-            self.password = configs.get('mysql').get('password')
-            self.database = configs.get('mysql').get('database')
+        self.host = os.getenv("DB_HOST")
+        self.user = os.getenv("DB_USER")
+        self.password = os.getenv("DB_PASSWORD")
+        self.database = os.getenv("DB_NAME")
 
-            self.receipt_printer_VID = int(
-                os.getenv("RECEIPT_PRINTER_VID"), 16)
-            self.receipt_printer_PID = int(
-                os.getenv("RECEIPT_PRINTER_PID"), 16)
-            self.receipt_printer_TIMEOUT = os.getenv("RECEIPT_PRINTER-TIMEOUT")
+        self.receipt_printer_VID = int(
+            os.getenv("RECEIPT_PRINTER_VID"), 16)
+        self.receipt_printer_PID = int(
+            os.getenv("RECEIPT_PRINTER_PID"), 16)
+        self.receipt_printer_TIMEOUT = os.getenv("RECEIPT_PRINTER-TIMEOUT")
 
     def open_receipt_printer(self):
         return Usb(self.receipt_printer_VID, self.receipt_printer_PID, self.receipt_printer_TIMEOUT)
