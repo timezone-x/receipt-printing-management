@@ -28,7 +28,7 @@ class QueueDB:
         self.receipt_printer_PID = int(
             os.getenv("RECEIPT_PRINTER_PID"), 16)
         self.receipt_printer_TIMEOUT = int(
-            os.getenv("RECEIPT_PRINTER-TIMEOUT"))
+            os.getenv("RECEIPT_PRINTER_TIMEOUT"))
 
     def open_receipt_printer(self):
         return Usb(self.receipt_printer_VID, self.receipt_printer_PID, self.receipt_printer_TIMEOUT)
@@ -144,7 +144,7 @@ class QueueDB:
     #         for i in list_items:
 
 
-queue = QueueDB('config.json')
+queue = QueueDB()
 
 if __name__ == '__main__':
     while True:
