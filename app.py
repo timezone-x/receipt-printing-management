@@ -32,7 +32,7 @@ def api_task():
         key_info = KM.getInfo(token)
         sender = key_info.get("name")
         task_name = request.json.get('name')
-        task_priority = request.json.get('priority')
+        task_priority = int(request.json.get('priority'))
         task_deadline = request.json.get('deadline')
         task_desc = request.json.get('description')
         printer = 'receipt'

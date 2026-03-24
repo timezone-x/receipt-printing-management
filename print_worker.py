@@ -27,7 +27,8 @@ class QueueDB:
             os.getenv("RECEIPT_PRINTER_VID"), 16)
         self.receipt_printer_PID = int(
             os.getenv("RECEIPT_PRINTER_PID"), 16)
-        self.receipt_printer_TIMEOUT = os.getenv("RECEIPT_PRINTER-TIMEOUT")
+        self.receipt_printer_TIMEOUT = int(
+            os.getenv("RECEIPT_PRINTER-TIMEOUT"))
 
     def open_receipt_printer(self):
         return Usb(self.receipt_printer_VID, self.receipt_printer_PID, self.receipt_printer_TIMEOUT)
@@ -46,7 +47,7 @@ class QueueDB:
             cursor = db.cursor()
             if fail_reason:
                 cursor.execute(
-                    'UPDATE jobs Set status=%s fail_reason=%s WHERE id=%s', (status, fail_reason, job_id))
+                    'UPDATE jobs Set status=%s, fail_reason=%s WHERE id=%s', (status, fail_reason, job_id))
             else:
                 cursor.execute(
                     'UPDATE jobs Set status=%s WHERE id=%s', (status, job_id))
@@ -150,9 +151,8 @@ if __name__ == '__main__':
         job = queue.fetch_next_job()
         if job:
             print("Job Found!")
-
             print("Converting Job header to JSON")
-            print(job.get("job_header   "))
+            print(job.get("job_header"))
             job['job_header'] = json.loads(job.get('job_header'))
             print(job)
             queue.mark_job_status(job['id'], 'printing')
