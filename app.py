@@ -1,5 +1,6 @@
 import os
 from datetime import timedelta
+from urllib import response
 from dotenv import load_dotenv
 from flask import Flask, jsonify, redirect, render_template, url_for, request, session
 from queue_handler import QueueHandler
@@ -21,16 +22,20 @@ def index():
 
 
 @app.route('/receipt/task')
-def task():
+def render_task():
     return render_template('task.html')
 
 
+@app.route('/receipt/message')
+def render_message():
+    return render_template('message.html')
+
+
 @app.route('/api/receipt/task', methods=['POST'])
-def api_task():
+def task():
     token = request.args.get('token')
     if KM.checkKeyPerm(token, "task") == 200:
-        key_info = KM.getInfo(token)
-        sender = key_info.get("name")
+        sender = token
         task_name = request.json.get('name')
         task_priority = int(request.json.get('priority'))
         task_deadline = request.json.get('deadline')
@@ -48,6 +53,30 @@ def api_task():
         return jsonify({'status': 200})
     else:
         return jsonify({"status": KM.checkKeyPerm(token, "task")})
+
+
+@app.route('/api/receipt/message', methods=["POST"])
+def message():
+    token = request.args.get('token')
+    if KM.checkKeyPerm(token, 'message') == 200:
+        pass
+    else:
+        return jsonify({"status": KM.checkKeyPerm(token, 'message')})
+
+
+@app.route('/api/userdata')
+def fetch_userdata():
+    token = request.args.get('token')
+    if KM.checkKey(token):
+
+        user_data = KM.getInfo(token)
+        requested_data = request.args.get("req_data")
+        response = {}
+        for i in requested_data:
+
+        return jsonify(KM.getInfo(token))
+    else:
+        return jsonify({"status": 401})
 
 
 if __name__ == '__main__':

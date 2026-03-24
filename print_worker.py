@@ -1,6 +1,7 @@
 import time
 import json
 import os
+from datetime import datetime
 import textwrap
 import mysql.connector
 from escpos.printer import Usb
@@ -23,12 +24,22 @@ class QueueDB:
         self.password = os.getenv("DB_PASSWORD")
         self.database = os.getenv("DB_NAME")
 
+        self.curfew_end = os.getenv("CURFEW_END", "08:00")
+        self.curfew_start = os.getenv("CURFEW_START", "23:00")
+        self.curfew_sleep = os.getenv("CURFEW_SLEEP", 60)
+
         self.receipt_printer_VID = int(
             os.getenv("RECEIPT_PRINTER_VID"), 16)
         self.receipt_printer_PID = int(
             os.getenv("RECEIPT_PRINTER_PID"), 16)
         self.receipt_printer_TIMEOUT = int(
             os.getenv("RECEIPT_PRINTER_TIMEOUT"))
+
+    def is_curfew_active(self):
+        now = datetime.now().time()
+        start = datetime.strptime(self.curfew_start, "%H:%M").time()
+        end = datetime.strptime(self.curfew_end, "%H:%M").time()
+        return start <= now or now <= end
 
     def open_receipt_printer(self):
         return Usb(self.receipt_printer_VID, self.receipt_printer_PID, self.receipt_printer_TIMEOUT)
@@ -37,7 +48,7 @@ class QueueDB:
         with mysql.connector.connect(host=self.host, user=self.user, password=self.password, database=self.database) as db:
             cursor = db.cursor(dictionary=True)
             cursor.execute(
-                "SELECT * FROM jobs WHERE status='queued' ORDER BY created_at LIMIT 1")
+                "SELECT * FROM jobs WHERE status='queued' AND (urgent=1 OR TIME(NOW) BETWEEN '8:00' AND '23:00') ORDER BY created_at LIMIT 1")
             job = cursor.fetchone()
             db.commit()
             return job
@@ -94,6 +105,12 @@ class QueueDB:
             task_deadline = job_header.get('deadline')
             temp_task_desc = job.get("job_body")
 
+            receipt_printer.set(invert=True, bold=True,
+                                align='center', double_height=2, double_width=2)
+            receipt_printer.text("*TASK*\n\n")
+            receipt_printer._raw(b'\x1B\x21\x00')
+
+            receipt_printer.set(bold=True, invert=False, align='left')
             receipt_printer.set(bold=True)
             receipt_printer.text("="*42)
             receipt_printer.set(bold=True, double_height=2,
@@ -158,4 +175,7 @@ if __name__ == '__main__':
             queue.mark_job_status(job['id'], 'printing')
             queue.job_funnel(job)
         else:
-            time.sleep(1)
+            if queue.is_curfew_active():
+                time.sleep(queue.curfew_sleep)
+            else:
+                time.sleep(1)

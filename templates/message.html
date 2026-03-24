@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<script scr="{{ url_for('static', filename='js/message') }}" defer></script>
+{% endblock %}
+
+{% block body %}
+<div>
+  <div id="result"></div>
+  <form id="message-form">
+    <input type="password" id="token" name="token" placeholder="Token*" autofocus required><br>
+    <input type="text" id="sender" placeholder="Sender*" required><br>
+    <label for="remember_me">Remember Me?</label> <input type="checkbox" id="remember_me" value="true"><br>
+    <label for="remember_me">Urgent Message</label> <input type="checkbox" id="urgent" value="true"><br>
+    <label for="description">Message:/label><br>
+      <textarea id="description" name="description" style="resize: vertical;" rows="10" cols="25"></textarea><br>
+      <input type="submit" id="submit"> <input type="reset">
+
+  </form>
+</div>
+{% endblock %}

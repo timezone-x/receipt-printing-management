@@ -51,10 +51,12 @@ class KeyManager:
             permissions = result.get("permissions")
             expiry = result.get("expiry")
             settings = result.get('settings')
+            user_settings = result.get('user_settings')
             return {
                 "id": id,
                 "name": name,
                 "permissions": permissions,
                 "expiry": expiry,
-                "settings": settings
+                "settings": settings,
+                "user_settings": user_settings
             }
