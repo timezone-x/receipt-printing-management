@@ -11,7 +11,7 @@ Home
 {% block body %}
 <div class="index_main">
   <div class="index_section">
-    <h1>Receipt Printing</h1><br>
+    <h1>Quick Receipts</h1><br>
     <a href="/receipt/task" title="Print a Task Ticket!">
       Task Ticket
     </a>
@@ -21,7 +21,19 @@ Home
     </a>
   </div>
   <div class="index_section">
-    <h1>More Options Coming Soon!</h1>
+    <h1>Login</h1>
+      <div>
+          <form id="login-form">
+              <label for="user-id">User Id</label>
+              <input id="user-id" placeholder="0000">
+              <label for="password">Password</label>
+              <input type="password" id="password" placeholder="A strong Password">
+              <input type="submit" value="Login">
+          </form>
+          <div id="result">
+
+          </div>
+      </div>
   </div>
 </div>
 {% endblock %}
